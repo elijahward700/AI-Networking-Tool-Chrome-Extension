@@ -1,0 +1,40 @@
+{
+    "manifest_version": 3,
+    "name": "Article Capture & Contact Matcher",
+    "version": "1.0",
+    "description": "Capture webpage content for classification and match article tags to contacts",
+    "permissions": [
+      "activeTab",
+      "scripting",
+      "clipboardWrite",
+      "storage",
+      "tabs"
+    ],
+    "host_permissions": [
+      "<all_urls>"
+    ],
+    "web_accessible_resources": [{
+      "resources": ["html2pdf.bundle.min.js"],
+      "matches": ["<all_urls>"]
+    }],
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"],
+        "run_at": "document_end",
+        "all_frames": true
+      }
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "icons/icon16.png"
+      }
+    },
+    "icons": {
+      "16": "icons/icon16.png"
+    }
+  }

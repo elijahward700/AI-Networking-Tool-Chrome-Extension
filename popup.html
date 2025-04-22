@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Article Capture</title>
+  <style>
+    body {
+      width: 350px;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+    }
+    button {
+      margin: 8px 0;
+      padding: 8px 15px;
+      width: 100%;
+      background-color: #4285f4;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #3367d6;
+    }
+    .button-secondary {
+      background-color: #f8f9fa;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+    }
+    .button-secondary:hover {
+      background-color: #f1f3f4;
+    }
+    .button-row {
+      display: flex;
+      gap: 8px;
+    }
+    .button-row button {
+      flex: 1;
+    }
+    .progress-bar-container {
+      margin-top: 10px;
+      width: 100%;
+      height: 8px;
+      background-color: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background-color: #4285f4;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    .options {
+      display: none;
+      margin-top: 15px;
+    }
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 15px 0;
+      padding: 10px;
+      border-radius: 4px;
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+    }
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #4285f4;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .retry-button {
+      margin-top: 10px;
+      padding: 6px 12px;
+      background-color: #f1f1f1;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+    #api-key-container {
+      margin-top: 15px;
+    }
+    #api-key {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    .hidden {
+      display: none;
+    }
+    #summary-container {
+      margin-top: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      display: none;
+    }
+    #contacts-upload-container {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    #contacts-file {
+      margin-bottom: 10px;
+    }
+    #matched-contacts {
+      margin-top: 15px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 4px;
+      max-height: 150px;
+      overflow-y: auto;
+      display: none;
+    }
+    .tag-input {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      box-sizing: border-box;
+    }
+    .matches-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .contact-item {
+      margin: 5px 0;
+      padding: 3px;
+      background-color: #f5f5f5;
+      border-radius: 3px;
+    }
+    .performance-tip {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+      font-style: italic;
+    }
+    .mode-label {
+      font-size: 12px;
+      color: #0070e0;
+      margin: 0;
+      font-weight: bold;
+    }
+    .classification-section {
+      margin-top: 10px;
+      padding: 8px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .loading-text {
+      display: none !important;
+    }
+    
+    /* Tag list styles */
+    #tags-container {
+      margin-bottom: 15px;
+    }
+    
+    #tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+      min-height: 30px;
+    }
+    
+    .tag-item {
+      display: flex;
+      align-items: center;
+      background-color: #e3f2fd;
+      color: #1565c0;
+      padding: 5px 10px;
+      border-radius: 16px;
+      font-size: 14px;
+      border: 1px solid #90caf9;
+      position: relative;
+      transition: background-color 0.2s, box-shadow 0.2s, color 0.2s;
+      max-width: 100%;
+      cursor: pointer;
+    }
+    
+    .tag-item:hover {
+      background-color: #ffebee;
+      border-color: #ef9a9a;
+      color: #c62828;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .tag-item .tag-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .tag-input-container {
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Article Capture</h2>
+  
+  <div id="contacts-upload-container">
+    <h3>Upload Contacts CSV</h3>
+    <p>First, upload a CSV file with contacts and their tags</p>
+    <p>Format: Name, Tags (comma separated)</p>
+    <input type="file" id="contacts-file" accept=".csv">
+    <button id="upload-contacts-button">Upload Contacts</button>
+    <div id="contacts-status"></div>
+  </div>
+  
+  <div class="button-row">
+    <button id="capture-button">Capture Article</button>
+  </div>
+  <p class="performance-tip">Captures article text and automatically tags content using AI</p>
+  
+  <div id="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <p id="loading-text" class="loading-text">Capturing article content...</p>
+    <div class="progress-bar-container">
+      <div id="progress-bar" class="progress-bar"></div>
+    </div>
+    <div id="cancel-container" class="hidden">
+      <button id="cancel-button" class="retry-button">Cancel</button>
+    </div>
+  </div>
+  
+  <div id="options" class="options">
+    <h3>Article Captured!</h3>
+    <button id="copy-button">Copy Text</button>
+    <button id="download-button">Download Text</button>
+    <button id="summarize-button">Summarize Content</button>
+    
+    <div id="tag-article-container">
+      <h3>AI-Generated Tags</h3>
+      <div id="tags-container">
+        <div id="tags-list"></div>
+        <div class="tag-input-container">
+          <input type="text" id="tag-input" class="tag-input" placeholder="Type a tag and press Enter">
+        </div>
+      </div>
+      <button id="match-contacts-button">Find Matching Contacts</button>
+    </div>
+    
+    <div id="matched-contacts">
+      <div class="matches-title">People who might be interested:</div>
+      <div id="matched-contacts-list"></div>
+    </div>
+  </div>
+  
+  <div id="api-key-container" class="hidden">
+    <p>Enter your OpenAI API Key to enable automatic article tagging:</p>
+    <input type="password" id="api-key" placeholder="sk-...">
+    <button id="save-api-key">Save Key</button>
+  </div>
+
+  <div id="summary-container">
+    <h3>Article Analysis</h3>
+    <div id="summary-content" class="classification-section"></div>
+    <p class="performance-tip">The tags above were automatically generated by AI based on the article content. You can edit them manually if needed.</p>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
