@@ -14,22 +14,22 @@
       "<all_urls>"
     ],
     "web_accessible_resources": [{
-      "resources": ["html2pdf.bundle.min.js"],
+      "resources": ["lib/html2pdf.bundle.min.js"],
       "matches": ["<all_urls>"]
     }],
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
-        "js": ["content.js"],
+        "js": ["src/js/content.js"],
         "run_at": "document_end",
         "all_frames": true
       }
     ],
     "background": {
-      "service_worker": "background.js"
+      "service_worker": "src/js/background.js"
     },
     "action": {
-      "default_popup": "popup.html",
+      "default_popup": "src/html/popup.html",
       "default_icon": {
         "16": "icons/icon16.png"
       }
